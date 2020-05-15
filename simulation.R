@@ -129,7 +129,7 @@ for(iteration in 1:2000){
   output[[iteration]] <- data.frame(
     cbind(
       coefs     = rownames(AsH1),
-      iteration = i,
+      iteration = iteration,
       AsH1      = AsH1$`Pr(>F)`,
       AsH0      = AsH0$`Pr(>F)`,
       AiH1      = AiH1$`Pr(>F)`,
