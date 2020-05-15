@@ -147,4 +147,6 @@ for(iteration in 1:2000){
   
   write.csv2(do.call("rbind", output), file = "output-simulation-random-effects.csv")
 }
+
+sessionInfo()
 #########################################
