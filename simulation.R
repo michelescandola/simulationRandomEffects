@@ -34,7 +34,7 @@ for(iteration in 1:2000){
   ## random generation of random effects for each participant
   ##################
   stddev <- runif(9, min = 0.01, max = 1)
-  
+  print( iteration )
   corMat <- rcorrmatrix(9)
   
   covMat <- stddev %*% t(stddev) * corMat
@@ -126,7 +126,7 @@ for(iteration in 1:2000){
   AiH0 <- Anova(int.H0   , type = 3 , test = "F")
   elapsed.time.AiH0   <- Sys.time() - start.time
   
-  output[[i]] <- data.frame(
+  output[[iteration]] <- data.frame(
     cbind(
       coefs     = rownames(AsH1),
       iteration = i,
@@ -144,7 +144,7 @@ for(iteration in 1:2000){
       elapsed.time.AiH0
     )
   )
+  
+  write.csv2(do.call("rbind", output), file = "output-simulation-random-effects.csv")
 }
-
-write.csv2(do.call("rbind", output), file = "output-simulation-random-effects.csv")
 #########################################
