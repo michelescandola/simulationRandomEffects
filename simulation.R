@@ -23,8 +23,8 @@ NSubj   <- 30
 NTrials <- 30
 
 ## coefficients for fixed effects
-betasH0 <- c( 5 , 0 , 0 , 0 , 0 , 0 , 0 ,  0 , 0)
-betasH1 <- c( 5 , 0 , 0 , 0 , 0 , 0,0.3 ,0.3, 0)
+betasH0 <- c( 0 , 0 , 0 , 0 , 0 , 0 , 0 ,  0 , 0)
+betasH1 <- c( 0 , 0 , 0 , 0 , 0 , 0,0.4 ,0.4, 0)
 
 ## output list
 output <- list()
