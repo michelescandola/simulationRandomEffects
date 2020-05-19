@@ -49,7 +49,7 @@ covMat <- stddev %*% t(stddev) * corMat
 ## output list
 output <- list()
 
-for(iteration in 1:100){
+for(iteration in 1:2000){
   ##################
   ## random generation of random effects for each participant
   ##################

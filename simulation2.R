@@ -29,7 +29,7 @@ betasH1 <- c( 0 , 0 , 0 , 0 , 0 , 0,0.4 ,0.4, 0)
 ## output list
 output <- list()
 
-for(iteration in 1:100){
+for(iteration in 1:2000){
   ##################
   ## random generation of random effects for each participant
   ##################
