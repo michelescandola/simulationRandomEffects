@@ -110,11 +110,11 @@ for(iteration in 1:2000){
   ## models fitting
   ##################
   start.time         <- Sys.time()
-  nfull.H0           <- suppressMessages( lmer( yH0 ~ Group * WCond + (1 | ID:Wcond) , data = data.sim ) )
+  nfull.H0           <- suppressMessages( lmer( yH0 ~ Group * WCond + (1 | ID:WCond) , data = data.sim ) )
   elapsed.time.nH0   <- Sys.time() - start.time
   
   start.time         <- Sys.time()
-  nfull.H1 <- suppressMessages( lmer( yH1 ~ Group * WCond + (1 | ID:Wcond) , data = data.sim ) )
+  nfull.H1 <- suppressMessages( lmer( yH1 ~ Group * WCond + (1 | ID:WCond) , data = data.sim ) )
   elapsed.time.nH1   <- Sys.time() - start.time
   
   start.time         <- Sys.time()
