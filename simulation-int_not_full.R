@@ -146,7 +146,7 @@ for(iteration in 1:2000){
   
   output[[iteration]] <- data.frame(
     cbind(
-      coefs     = rownames(AsH1),
+      coefs     = rownames(AnH1),
       iteration = iteration,
       AnH1      = AnH1$`Pr(>F)`,
       AnH0      = AnH0$`Pr(>F)`,
