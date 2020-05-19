@@ -27,7 +27,7 @@ betasH0 <- c( 0 , 0 , 0 , 0 , 0 , 0 , 0 ,  0 , 0)
 betasH1 <- c( 0 , 0 , 0 , 0 , 0 , 0,0.4 ,0.4, 0)
 
 ## parameters for the random effects
-stddev <- rep(0.1, 9)
+stddev <- rep(0.5, 9)
 
 corMat <- matrix(
   c(

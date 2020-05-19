@@ -1,6 +1,6 @@
 ##############################################################
-## Simulation - differences between having random
-##              intercepts or slopes
+## Simulation - differences between having full random
+##              intercepts or not full random intercepts
 ##              does it inflates 1st or 2nd type errors?
 ## code by Scandola M., idea by Tidoni E.
 ##############################################################
@@ -10,8 +10,8 @@ library(clusterGeneration)
 library(lmerTest)
 library(car)
 
-## is it better y ~ Group * NWCond + (NWCond | ID)
-##           or y ~ Group * NWCond + (1 | ID/NWCond) ?
+## is it better y ~ Group * WCond + (1 | ID:WCond)
+##           or y ~ Group * WCond + (1 | ID/WCond) ?
 
 ## NGroups = number of simulated groups (between-subjects)
 ## NTrials = number of trials each condition
@@ -26,6 +26,26 @@ NTrials <- 30
 betasH0 <- c( 0 , 0 , 0 , 0 , 0 , 0 , 0 ,  0 , 0)
 betasH1 <- c( 0 , 0 , 0 , 0 , 0 , 0,0.4 ,0.4, 0)
 
+## coefficients for random effects
+stddev <- rep(0.5, 9)
+
+corMat <- matrix(
+  c(
+    1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+    0.2, 1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+    0.2,0.2,  1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+    0.2,0.2,0.2,   1, 0.2, 0.2, 0.2, 0.2, 0.2,
+    0.2,0.2,0.2, 0.2,   1, 0.2, 0.2, 0.2, 0.2,
+    0.2,0.2,0.2, 0.2, 0.2,   1, 0.2, 0.2, 0.2,
+    0.2,0.2,0.2, 0.2, 0.2, 0.2,   1, 0.2, 0.2,
+    0.2,0.2,0.2, 0.2, 0.2, 0.2, 0.2,   1, 0.2,
+    0.2,0.2,0.2, 0.2, 0.2, 0.2, 0.2, 0.2,   1
+  ),
+  ncol=9
+)
+
+covMat <- stddev %*% t(stddev) * corMat
+
 ## output list
 output <- list()
 
@@ -33,24 +53,9 @@ for(iteration in 1:100){
   ##################
   ## random generation of random effects for each participant
   ##################
-  stddev <- rep(0.5, 9)
-  print( iteration )
-  corMat <- matrix(
-    c(
-      1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
-      0.2, 1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
-      0.2,0.2,  1, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
-      0.2,0.2,0.2,   1, 0.2, 0.2, 0.2, 0.2, 0.2,
-      0.2,0.2,0.2, 0.2,   1, 0.2, 0.2, 0.2, 0.2,
-      0.2,0.2,0.2, 0.2, 0.2,   1, 0.2, 0.2, 0.2,
-      0.2,0.2,0.2, 0.2, 0.2, 0.2,   1, 0.2, 0.2,
-      0.2,0.2,0.2, 0.2, 0.2, 0.2, 0.2,   1, 0.2,
-      0.2,0.2,0.2, 0.2, 0.2, 0.2, 0.2, 0.2,   1
-    ),
-    ncol=9
-  )
   
-  covMat <- stddev %*% t(stddev) * corMat
+  print( iteration )
+
   random.effects <- rmvnorm(NSubj, mean = c( 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 ), sigma = covMat)
   
   ##################
@@ -105,12 +110,12 @@ for(iteration in 1:100){
   ## models fitting
   ##################
   start.time         <- Sys.time()
-  slope.H0           <- suppressMessages( lmer( yH0 ~ Group * WCond + (WCond | ID) , data = data.sim ) )
-  elapsed.time.sH0   <- Sys.time() - start.time
+  nfull.H0           <- suppressMessages( lmer( yH0 ~ Group * WCond + (1 | ID:Wcond) , data = data.sim ) )
+  elapsed.time.nH0   <- Sys.time() - start.time
   
   start.time         <- Sys.time()
-  slope.H1 <- suppressMessages( lmer( yH1 ~ Group * WCond + (WCond | ID) , data = data.sim ) )
-  elapsed.time.sH1   <- Sys.time() - start.time
+  nfull.H1 <- suppressMessages( lmer( yH1 ~ Group * WCond + (1 | ID:Wcond) , data = data.sim ) )
+  elapsed.time.nH1   <- Sys.time() - start.time
   
   start.time         <- Sys.time()
   int.H0 <- suppressMessages( lmer( yH0 ~ Group * WCond + ( 1 | ID/WCond) , data = data.sim ) )
@@ -124,16 +129,16 @@ for(iteration in 1:100){
   ## models analysis
   ##################
   start.time         <- Sys.time()
-  AsH1 <- Anova(slope.H1 , type = 3 , test = "F")
-  elapsed.time.AsH1   <- Sys.time() - start.time
+  AnH1 <- Anova(nfull.H1 , type = 3 , test = "F")
+  elapsed.time.AnH1   <- Sys.time() - start.time
   
   start.time         <- Sys.time()
   AiH1 <- Anova(int.H1   , type = 3 , test = "F")
   elapsed.time.AiH1   <- Sys.time() - start.time
   
   start.time         <- Sys.time()
-  AsH0 <- Anova(slope.H0 , type = 3 , test = "F")
-  elapsed.time.AsH0   <- Sys.time() - start.time
+  AnH0 <- Anova(nfull.H0 , type = 3 , test = "F")
+  elapsed.time.AnH0   <- Sys.time() - start.time
   
   start.time         <- Sys.time()
   AiH0 <- Anova(int.H0   , type = 3 , test = "F")
@@ -143,22 +148,22 @@ for(iteration in 1:100){
     cbind(
       coefs     = rownames(AsH1),
       iteration = iteration,
-      AsH1      = AsH1$`Pr(>F)`,
-      AsH0      = AsH0$`Pr(>F)`,
+      AnH1      = AnH1$`Pr(>F)`,
+      AnH0      = AnH0$`Pr(>F)`,
       AiH1      = AiH1$`Pr(>F)`,
       AiH0      = AiH0$`Pr(>F)`,
-      elapsed.time.sH0,
-      elapsed.time.sH1,
+      elapsed.time.nH0,
+      elapsed.time.nH1,
       elapsed.time.iH0,
       elapsed.time.iH1,
-      elapsed.time.AsH1,
-      elapsed.time.AsH0,
+      elapsed.time.AnH1,
+      elapsed.time.AnH0,
       elapsed.time.AiH1,
       elapsed.time.AiH0
     )
   )
   
-  write.csv2(do.call("rbind", output), file = "output-simulation-random-effects.csv")
+  write.csv2(do.call("rbind", output), file = "output-simulation-not-full.csv")
 }
 
 sessionInfo()
