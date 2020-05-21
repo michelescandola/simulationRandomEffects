@@ -35,7 +35,7 @@ betasH1 <- c( 0 , 0 , 0 , 0 , 0 , 0,0.4 ,0.4, 0)
 
 ## generation of random effects for stimuli
 ran.stim <- rnorm( NStimuli )
-ran.stim <- rep( ran.stim, each = NTrials)
+ran.stim <- rep( rep( ran.stim, each = NTrials ), times = NWCond )
 
 ## output list
 output <- list()
@@ -65,7 +65,7 @@ for(iteration in 1:2000){
   ##################
   data.sim <- expand.grid(
     trial      = 1:NTrials,
-    Stimulus   = 1:NStimuli,
+    Stimulus   = factor(1:NStimuli),
     ID         = factor(1:NSubj),
     WCond      = factor(1:NWCond)
   )
@@ -94,9 +94,9 @@ for(iteration in 1:2000){
     
     mm  <- model.matrix(~ Group * WCond , data = data.sim[ sel , ] )
     
-    yH0[sel] <- mm %*% as.matrix(coefsH0[ i , ]) + rnorm( n = NTrials * NWCond ) + ran.stim
+    yH0[sel] <- mm %*% as.matrix(coefsH0[ i , ]) + rnorm( n = NTrials * NWCond * NStimuli ) + ran.stim
     
-    yH1[sel] <- mm %*% as.matrix(coefsH1[ i , ]) + rnorm( n = NTrials * NWCond ) + ran.stim
+    yH1[sel] <- mm %*% as.matrix(coefsH1[ i , ]) + rnorm( n = NTrials * NWCond * NStimuli ) + ran.stim
       
   }
   

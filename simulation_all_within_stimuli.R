@@ -38,7 +38,7 @@ betasH1 <- c( 0 , 0 , 0 , 0 , 0 , 0,0.4 ,0.4, 0)
 
 ## generation of random effects for stimuli
 ran.stim <- rnorm( NStimuli )
-ran.stim <- rep( ran.stim, each = NTrials)
+ran.stim <- rep( rep( ran.stim, each = NTrials ), times = NCond1 * NCond2 )
 
 ## output list
 output <- list()
@@ -68,6 +68,7 @@ for(iteration in 1:2000){
   ##################
   data.sim <- expand.grid(
     trial      = 1:NTrials,
+    Stimulus   = factor(1:NStimuli),
     ID         = factor(1:NSubj),
     Cond1      = factor(1:NCond1),
     Cond2      = factor(1:NCond2)
@@ -87,9 +88,9 @@ for(iteration in 1:2000){
     
     mm  <- model.matrix(~ Cond1 * Cond2 , data = data.sim[ sel , ] )
     
-    yH0[sel] <- mm %*% as.matrix(coefsH0[ i , ]) + rnorm( n = NTrials * NCond1 * NCond2 )
+    yH0[sel] <- mm %*% as.matrix(coefsH0[ i , ]) + rnorm( n = NTrials * NCond1 * NCond2 * NStimuli ) + ran.stim
     
-    yH1[sel] <- mm %*% as.matrix(coefsH1[ i , ]) + rnorm( n = NTrials * NCond1 * NCond2 )
+    yH1[sel] <- mm %*% as.matrix(coefsH1[ i , ]) + rnorm( n = NTrials * NCond1 * NCond2 * NStimuli ) + ran.stim
       
   }
   
@@ -125,7 +126,7 @@ for(iteration in 1:2000){
   et.pi.H0           <- difftime( Sys.time(), start.time , units = "secs" )
   
   start.time         <- Sys.time()
-  pi.H1              <- suppressMessages( lmer( yH1 ~ Cond1 * Cond2 + ( 1 | ID:Cond1) , data = data.sim ) )
+  pi.H1              <- suppressMessages( lmer( yH1 ~ Cond1 * Cond2 + ( 1 | ID:Cond1) + (1 | Stimulus) , data = data.sim ) )
   et.pi.H1           <- difftime( Sys.time(), start.time , units = "secs" )
   
   start.time         <- Sys.time()
